@@ -25,7 +25,7 @@ jobs:
           
       # Publish Samples project to release folder 
       - name: Publish .NET Core Project
-        run: dotnet publish ML5.Blazor.Samples.csproj -c Release -o release --nologo
+        run: dotnet publish ML5.Blazor.Samples/ML5.Blazor.Samples.csproj -c Release -o release --nologo
       
       # Deploy
       - name: Comit wwwroot to github pages
