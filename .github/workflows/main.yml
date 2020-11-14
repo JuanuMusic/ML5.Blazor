@@ -16,7 +16,7 @@ jobs:
         
       #set up .net core
       - name: Setup .NET Core SDK
-        uses: action/setup-dotnet@v1
+        uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.301
         
