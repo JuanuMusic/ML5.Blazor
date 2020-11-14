@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RazorLangVersion>3.0</RazorLangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TypescriptOutDir>wwwroot\src</TypescriptOutDir>
+    <ResolveCurrentProjectStaticWebAssetsInputsDependsOn>
+      CompileTypeScript;
+      $(ResolveCurrentProjectStaticWebAssetsInputs)
+    </ResolveCurrentProjectStaticWebAssetsInputsDependsOn>
+    <AssemblyName>ML5.Blazor</AssemblyName>
+    <Version>0.1</Version>
+    <Authors>Juan Manuel Haedo</Authors>
+    <Description>An ML5.js wrapper for Blazor built in C#and Typescript</Description>
+    <Copyright>Juan Manuel Haedo 2020</Copyright>
+    <PackageProjectUrl>https://github.com/JuanuMusic/ML5.Blazor</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/JuanuMusic/ML5.Blazor</RepositoryUrl>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.9" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\package-lock.json" />
+    <Content Remove="wwwroot\package.json" />
+    <Compile Remove="wwwroot\node_modules\**" />
+    <Compile Remove="wwwroot\src\**" />
+    <Content Remove="wwwroot\node_modules\**" />
+    <Content Remove="wwwroot\src\**" />
+    <EmbeddedResource Remove="wwwroot\node_modules\**" />
+    <EmbeddedResource Remove="wwwroot\src\**" />
+    <None Remove="wwwroot\node_modules\**" />
+    <None Remove="wwwroot\src\**" />
+    <TypeScriptCompile Remove="wwwroot\node_modules\**" />
+    <TypeScriptCompile Remove="wwwroot\src\**" />
+    <Content Remove="wwwroot\webpack.config.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="npm install" WorkingDirectory="$(ProjectDir)wwwroot" />
+    <Exec Command="npm run build" WorkingDirectory="$(ProjectDir)wwwroot" />
+  </Target>
+
+</Project>
