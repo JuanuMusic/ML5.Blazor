@@ -1,0 +1,126 @@
+﻿@using ML5.Blazor.NeuralNetworks;
+@using ML5.Blazor.Samples.DataModels;
+@page "/faceapi"
+@inject IJSRuntime JS;
+
+<h1>Classification Neural networks.</h1>
+<p>This code uses the same example as on <a href="https://learn.ml5js.org/#/reference/neural-network?id=creating-data-in-real-time">NeuralNetwork: Creating data in real-time</a></p>
+<small>Sorry for the poor example. <a href="https://github.com/JuanuMusic/ML5.Blazor/issues/1">Can you help improve it?</a></small>
+
+<button @onclick="TrainNNClicked" disabled="@isTrained">Train</button>
+<button @onclick="ClassifyClicked" disabled="@(!isTrained)">Classify</button>
+<InputFile OnChange="OnChange" class="form-control" />
+@if (this.results != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Label</th>
+                <th>Confidence</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var thisResult in results)
+            {
+                <tr>
+                    <td>@thisResult.Label</td>
+                    <td>@thisResult.Confidence</td>
+                </tr>
+            }
+            <tr>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+@code {
+
+    ML5Core ml5;
+    FaceApi faceApi
+    
+    async Task LoadImage(InputFileChangeEventArgs e)
+    {
+        var format = "image/jpeg";
+        var imageFile = await e.File.RequestImageFileAsync(format, 640, 480);
+
+        using var fileStream = imageFile.OpenReadStream(maxFileSize);
+        using var memoryStream = new MemoryStream();
+        await fileStream.CopyToAsync(memoryStream);
+
+        imageDataUri = $"data:{format};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Initialize ML5
+            ml5 = new ML5Core(JS);
+
+            var version = await ml5.Version();
+            Console.WriteLine("ML5 version {0}", version);
+
+            neuralNetwork = await ml5.BuildClassificationNeuralNetwork<IColorDataModelInput, IColorDataModelOutput>
+                (new NeuralNetworkOptions { Debug = true });
+
+            neuralNetwork.TrainingCompleted += NeuralNetwork_TrainingCompleted;
+            neuralNetwork.ClassificationCompleted += NeuralNetwork_ClassificationCompleted;
+
+            Console.WriteLine("Neural Network: " + neuralNetwork.ToString());
+        }
+    }
+
+    async void TrainNNClicked(MouseEventArgs e)
+    {
+        await AddData();
+        await Normalize();
+        await Train();
+    }
+
+    private async void ClassifyClicked() => await neuralNetwork.Classify(new ColorDataModelInput { R = 252, G = 0, B = 0 });
+
+    private async Task AddData()
+    {
+        // Build test data.
+        var data = new List<Color2StringDataModel>
+            ()
+    {
+            new Color2StringDataModel { R = 255, G =  0, B = 0, Color= "red-ish"},
+            new Color2StringDataModel { R = 254, G =  0, B = 0, Color= "red-ish"},
+            new Color2StringDataModel { R = 253, G =  0, B = 0, Color= "red-ish"},
+            new Color2StringDataModel { R = 0, G =  255, B = 0, Color= "green-ish"},
+            new Color2StringDataModel { R = 0, G =  254, B = 0, Color= "green-ish"},
+            new Color2StringDataModel { R = 0, G =  253, B = 0, Color= "green-ish"},
+            new Color2StringDataModel { R = 0, G =  0, B = 255, Color= "blue-ish"},
+            new Color2StringDataModel { R = 0, G =  0, B = 256, Color= "blue-ish"},
+            new Color2StringDataModel { R = 0, G =  0, B = 253, Color= "blue-ish"},
+            };
+
+        // Add data to the neural network
+        foreach (var item in data)
+        {
+            await neuralNetwork.AddData(item.Input, item.Output);
+        }
+    }
+
+    private async Task Normalize() => await neuralNetwork.NormalizeDataAsync();
+
+    private async Task Train() => await neuralNetwork.TrainAsync(new TrainingOptions { Epochs = 32, BatchSize = 12 });
+
+
+
+    private void NeuralNetwork_ClassificationCompleted(object error, ClassificationResult[] results)
+    {
+        this.results = results;
+        this.StateHasChanged();
+    }
+
+    protected void NeuralNetwork_TrainingCompleted(object sender, EventArgs eventArgs)
+    {
+        Console.WriteLine("Completed training");
+        isTrained = true;
+        this.StateHasChanged();
+    }
+}

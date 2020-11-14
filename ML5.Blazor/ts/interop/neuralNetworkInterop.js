@@ -74,11 +74,7 @@ var NeuralNetworkInterop = /** @class */ (function () {
      */
     NeuralNetworkInterop.prototype.train = function (instanceId, trainingOptions, dotNetHelper, callbackName) {
         if (callbackName === void 0) { callbackName = "onTrainingCompleted"; }
-        console.log("Training started...", trainingOptions);
-        this.get(instanceId).train(trainingOptions, function () {
-            console.log("Training finished");
-            dotNetHelper.invokeMethod(callbackName);
-        });
+        this.get(instanceId).train(trainingOptions, function () { return dotNetHelper.invokeMethod(callbackName); });
     };
     /**
      * Runs classify() on a specific NN instance and
@@ -89,10 +85,7 @@ var NeuralNetworkInterop = /** @class */ (function () {
      */
     NeuralNetworkInterop.prototype.classify = function (instanceId, input, dotNetHelper, callbackName) {
         if (callbackName === void 0) { callbackName = "onClassificationCompleted"; }
-        console.log("Input", input);
-        this.get(instanceId).classify(input, function (error, result) {
-            dotNetHelper.invokeMethod(callbackName, error, result);
-        });
+        this.get(instanceId).classify(input, function (error, result) { return dotNetHelper.invokeMethod(callbackName, error, result); });
     };
     return NeuralNetworkInterop;
 }());

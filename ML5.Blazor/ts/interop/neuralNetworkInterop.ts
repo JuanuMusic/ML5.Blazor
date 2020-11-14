@@ -81,11 +81,7 @@ export class NeuralNetworkInterop {
      * @param callbackName name of the function to invoke on the dotNetHelper once training is completed.
      */
     public train(instanceId: number, trainingOptions: ITrainingOptions, dotNetHelper, callbackName: string = "onTrainingCompleted") {
-        console.log("Training started...", trainingOptions);
-        this.get(instanceId).train(trainingOptions, () => {
-            console.log("Training finished");
-            dotNetHelper.invokeMethod(callbackName);
-        });
+        this.get(instanceId).train(trainingOptions, () => dotNetHelper.invokeMethod(callbackName));
     }
 
     /**
@@ -96,10 +92,7 @@ export class NeuralNetworkInterop {
      * @param callbackName name of the function to invoke on the dotNetHelper once classification is completed. Default is "onHandleResults"
      */
     public classify(instanceId: number, input, dotNetHelper, callbackName = "onClassificationCompleted") {
-        console.log("Input", input);
-        this.get(instanceId).classify(input, (error, result) => {
-            dotNetHelper.invokeMethod(callbackName, error, result);
-        });
+        this.get(instanceId).classify(input, (error, result) => dotNetHelper.invokeMethod(callbackName, error, result));
     }
 
 }
