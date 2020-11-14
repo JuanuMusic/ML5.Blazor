@@ -1,5 +1,5 @@
 {
-  "name": "tslib",
+  "name": "ml5.blazor.interop",
   "version": "1.0.0",
   "description": "",
   "private": true,
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode production"
   },
-  "author": "",
+  "author": "Juan Manuel Haedo",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.12.3",
