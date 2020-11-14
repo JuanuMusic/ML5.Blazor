@@ -9,15 +9,19 @@ jobs:
   deploy-to-github-pages:
     # use ubuntu latest image
     runs-on: ubuntu-latest
+    
     steps:
       #uses github checkout action to checkout code from master branch
       - uses: actions/checkout@v2
         
       #set up .net core
       - name: Setup .NET Core SDK
-        uses: action/setup-dotnet@v1.6.0
+        uses: action/setup-dotnet@v1
         with:
-          dotnet-version: 3.1
+          dotnet-version: 3.1.301
+        
+      - name: Install dependencies
+        run: dotnet restore
           
       # Publish Samples project to release folder 
       - name: Publish .NET Core Project
